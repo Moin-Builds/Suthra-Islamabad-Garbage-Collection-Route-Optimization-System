@@ -1,4 +1,4 @@
-# Garbage Collection Route Optimization
+# Garbage Collection Route Optimization System 
 
 Parallel Computing (PDC) semester project that optimizes garbage collection routes and compares **serial vs parallel** execution. Includes a Python backend (CLI + Flask API) and a React dashboard for configuration, live progress, and route visualization.
 

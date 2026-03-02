@@ -1,142 +1,202 @@
-# Garbage Collection Route Optimization System 
+# PDC Garbage Collection Route Optimization System
 
-Parallel Computing (PDC) semester project that optimizes garbage collection routes and compares **serial vs parallel** execution. Includes a Python backend (CLI + Flask API) and a React dashboard for configuration, live progress, and route visualization.
+A **Parallel Computing** project that optimizes garbage collection routes using both serial and parallel processing techniques. Features a stunning React frontend with real-time visualization and performance comparison.
 
 ![Status](https://img.shields.io/badge/status-active-success.svg)
 ![Python](https://img.shields.io/badge/python-3.8+-blue.svg)
-![Flask](https://img.shields.io/badge/flask-api-black.svg)
 ![React](https://img.shields.io/badge/react-18+-61DAFB.svg)
-![Vite](https://img.shields.io/badge/vite-5+-646CFF.svg)
 
-## Highlights
+## 🌟 Features
 
-- Serial vs parallel benchmarking with timing breakdown
-- Parallelized stages (priority scoring, distance/assignment, candidate route evaluation)
-- Interactive route visualization + side-by-side comparison report
-- Configurable workload (bins, trucks, threshold, candidates, workers)
+- **Parallel Route Optimization**: Compare serial vs parallel execution times
+- **Real-time Visualization**: Interactive map showing bins, trucks, and routes
+- **Performance Metrics**: Detailed timing breakdown for each optimization phase
+- **Modern React UI**: Dark-themed, responsive interface with smooth animations
+- **Configurable Parameters**: Adjust bins, trucks, workers, and more from the UI
 
-## Project Structure
+## 📁 Project Structure
 
 ```
-pdc_garbage_routes_project/
-├── pdc_garbage_routes/                 # Python backend
-│   ├── main.py                         # CLI entry point
-│   ├── api_server.py                   # Flask API for the React frontend
-│   ├── requirements.txt                # Python dependencies
-│   ├── scripts/
-│   │   └── run_demo_windows.bat
-│   ├── src/                            # Core modules
-│   │   ├── benchmark.py
-│   │   ├── data_generator.py
-│   │   ├── parallel_module.py
-│   │   ├── routing.py
-│   │   ├── visualizer.py
-│   │   └── models.py
-│   └── output/                         # Generated outputs (maps + reports)
-└── frontend/                            # React (Vite) dashboard
+pdc_garbage_routes_project_PRO/
+├── pdc_garbage_routes/          # Python Backend
+│   ├── main.py                  # CLI entry point
+│   ├── api_server.py            # Flask API server (for frontend)
+│   ├── requirements.txt         # Python dependencies
+│   ├── src/                     # Core modules
+│   │   ├── benchmark.py         # Optimization runner
+│   │   ├── data_generator.py    # Generate bin/truck data
+│   │   ├── parallel_module.py   # Parallel processing logic
+│   │   ├── routing.py           # Route optimization algorithms
+│   │   ├── visualizer.py        # Map visualization
+│   │   └── models.py            # Data models (Bin, Truck)
+│   └── output/                  # Generated route maps
+│
+└── frontend/                    # React Frontend
     ├── src/
+    │   ├── App.jsx              # Main application
+    │   ├── components/          # UI components
+    │   │   ├── Dashboard.jsx    # Main dashboard
+    │   │   ├── MapView.jsx      # Route visualization
+    │   │   ├── Configuration.jsx # Settings panel
+    │   │   └── Results.jsx      # Performance results
+    │   └── index.css            # Design system
     └── package.json
 ```
 
-## Requirements
+---
 
+## 🚀 Quick Start
+
+### Prerequisites
 - Python 3.8+
 - Node.js 18+
+- npm or yarn
 
-## Quick Start (Recommended: Full Stack)
+### Installation
 
-### 1) Backend setup
-
+#### 1. Install Python Dependencies
 ```bash
 cd pdc_garbage_routes
 pip install -r requirements.txt
 ```
 
-### 2) Frontend setup
-
+#### 2. Install Frontend Dependencies
 ```bash
 cd frontend
 npm install
 ```
 
-### 3) Run API + UI
+---
 
-Terminal 1 (API):
+## ▶️ Running the Project
 
+### Option 1: Full Stack (Frontend + Backend API) - RECOMMENDED
+
+**Step 1: Start the Python API Server** (Terminal 1)
 ```bash
 cd pdc_garbage_routes
 python api_server.py
 ```
+The API will start at: `http://localhost:5000`
 
-Terminal 2 (UI):
-
+**Step 2: Start the React Frontend** (Terminal 2)
 ```bash
 cd frontend
 npm run dev
 ```
+The frontend will start at: `http://localhost:5173`
 
-Open:
-- UI: http://localhost:5173
-- API: http://localhost:5000
+**Step 3: Open in Browser**
+Navigate to `http://localhost:5173` and click **"Run Optimization"**!
 
-## CLI Usage (Backend Only)
+---
+
+### Option 2: CLI Only (No Frontend)
+
+Run optimization directly from command line:
 
 ```bash
 cd pdc_garbage_routes
 python main.py
 ```
 
-Custom workload example:
-
+**With Custom Parameters:**
 ```bash
 python main.py --bins 5000 --trucks 6 --workers 8 --mode both
 ```
 
-## Configuration Options (CLI)
+---
 
-| Parameter | Flag | Default | Description |
-|---|---|---:|---|
-| Bins | `--bins` | 2000 | Number of garbage bins |
+## ⚙️ Configuration Options
+
+| Parameter | CLI Flag | Default | Description |
+|-----------|----------|---------|-------------|
+| Bins | `--bins` | 2000 | Number of garbage bins to simulate |
 | Trucks | `--trucks` | 4 | Number of collection trucks |
-| Threshold | `--threshold` | 70.0 | Collect bins with fill % ≥ threshold |
-| Grid | `--grid` | 100.0 | Simulation grid size |
+| Threshold | `--threshold` | 70.0 | Fill % above which bins are collected |
+| Grid | `--grid` | 100.0 | Size of the simulation grid |
 | Alpha | `--alpha` | 1.0 | Weight for fill priority |
 | Beta | `--beta` | 25.0 | Weight for proximity scoring |
-| Candidates | `--candidates` | 24 | Route candidates to evaluate |
+| Candidates | `--candidates` | 24 | Number of route candidates to evaluate |
 | Workers | `--workers` | Auto | Parallel worker threads |
 | Mode | `--mode` | both | `serial`, `parallel`, or `both` |
 
-## API Endpoints
+---
+
+## 🎮 Frontend Usage
+
+### Dashboard
+- View key metrics: Total Bins, Active Trucks, Distance, Speedup
+- Click **"Run Optimization"** to start the process
+- Real-time progress shown in loading overlay
+
+### Configuration Page
+- Adjust all parameters using sliders and inputs
+- Changes apply immediately to the next run
+
+### Results Page
+- View detailed timing breakdown
+- Compare serial vs parallel performance
+- Visual speedup indicator
+
+### Map View
+- Interactive visualization of bins and trucks
+- Color-coded by truck assignment
+- Zoom and pan controls
+
+---
+
+## 📊 Example Commands
+
+### Quick Demo (Default Settings)
+```bash
+python main.py
+```
+
+### Large Scale Test
+```bash
+python main.py --bins 20000 --trucks 6 --candidates 40 --mode both
+```
+
+### Parallel Only (Fast)
+```bash
+python main.py --bins 5000 --trucks 4 --mode parallel --workers 8
+```
+
+### Serial Only (Baseline)
+```bash
+python main.py --bins 5000 --trucks 4 --mode serial
+```
+
+---
+
+## 🔌 API Endpoints
 
 When running `api_server.py`:
 
 | Endpoint | Method | Description |
-|---|---|---|
-| `/api/health` | GET | Health check |
-| `/api/config/defaults` | GET | Default configuration |
-| `/api/system/info` | GET | CPU / system info |
-| `/api/optimize` | POST | Run optimization |
-| `/api/progress` | GET | Progress updates |
-| `/api/results` | GET | Latest results |
+|----------|--------|-------------|
+| `/api/health` | GET | Check API status |
+| `/api/config/defaults` | GET | Get default configuration |
+| `/api/system/info` | GET | Get CPU info |
+| `/api/optimize` | POST | Run optimization with parameters |
+| `/api/progress` | GET | Get current progress |
+| `/api/results` | GET | Get latest results |
 
-## Outputs
+---
 
-After running an optimization (CLI or API), outputs are written under:
+## 📈 Output Files
+
+After running optimization:
 
 ```
 output/
 ├── serial/
-│   └── route_map.png
+│   └── route_map.png    # Serial execution route map
 ├── parallel/
-│   └── route_map.png
-└── comparison.html
+│   └── route_map.png    # Parallel execution route map
+└── comparison.html      # Side-by-side comparison report
 ```
-
-Note: You may also see outputs in the repository-level `output/` folder, depending on how you run the project.
-
-## Suggested GitHub Description
-
-"Parallel garbage route optimization (PDC): serial vs parallel benchmarking with Python (Flask/CLI) + React dashboard, route visualization, and performance reports."
 
 ---
 

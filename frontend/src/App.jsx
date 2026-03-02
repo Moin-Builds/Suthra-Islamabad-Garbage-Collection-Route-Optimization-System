@@ -11,8 +11,8 @@ import Configuration from './components/Configuration';
 import Results from './components/Results';
 import LoadingOverlay from './components/LoadingOverlay';
 
-// API Base URL - Change this if running on different port
-const API_BASE_URL = 'http://localhost:5000/api';
+// API Base URL - uses relative path in production, localhost in development
+const API_BASE_URL = import.meta.env.PROD ? '/api' : 'http://localhost:5000/api';
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');

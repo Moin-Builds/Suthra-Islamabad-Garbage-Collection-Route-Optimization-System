@@ -1,0 +1,16 @@
+# render.yaml - Render Blueprint for PDC Garbage Routes Project
+# Deploy: Push to GitHub then connect to Render Dashboard
+
+services:
+  - type: web
+    name: pdc-garbage-routes
+    runtime: python
+    region: oregon
+    plan: free
+    buildCommand: "chmod +x build.sh && ./build.sh"
+    startCommand: "cd pdc_garbage_routes && gunicorn api_server:app --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 120"
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.6"
+      - key: NODE_VERSION
+        value: "20.11.0"

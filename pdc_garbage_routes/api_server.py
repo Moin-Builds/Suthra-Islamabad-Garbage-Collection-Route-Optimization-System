@@ -4,7 +4,7 @@ Islamabad, Pakistan - Real Route Optimization
 Supports Serial, Parallel, and Both modes for comparison
 """
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 import os
 import sys
@@ -15,6 +15,9 @@ import time
 HERE = pathlib.Path(__file__).resolve().parent
 if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
+
+# Path to React production build (built by build.sh)
+FRONTEND_BUILD = HERE.parent / 'frontend' / 'dist'
 
 from src.islamabad_data import (
     generate_islamabad_bins, 
@@ -27,7 +30,7 @@ from src.islamabad_data import (
 from src.parallel_module import compute_metrics, assign_bins_to_trucks, choose_best_route
 from src.routing import route_length
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder=str(FRONTEND_BUILD), static_url_path='')
 CORS(app)  # Enable CORS for React frontend
 
 # Store latest results
@@ -378,6 +381,19 @@ def get_truck_route(truck_id):
         return jsonify({"error": f"Route for truck {truck_id} not found"}), 404
     
     return jsonify(route)
+
+
+# Serve React frontend - catch-all route (must be LAST)
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve_frontend(path):
+    """Serve the React frontend build. Falls back to index.html for SPA routing."""
+    if path and (FRONTEND_BUILD / path).is_file():
+        return send_from_directory(str(FRONTEND_BUILD), path)
+    index = FRONTEND_BUILD / 'index.html'
+    if index.is_file():
+        return send_from_directory(str(FRONTEND_BUILD), 'index.html')
+    return jsonify({"message": "API is running. Frontend not built yet."}), 200
 
 
 if __name__ == '__main__':

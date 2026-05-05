@@ -15,18 +15,8 @@ import {
     Gauge
 } from 'lucide-react';
 import './Configuration.css';
-
-// Define validation limits for each parameter
-const LIMITS = {
-    bins: { min: 10, max: 1000, label: 'Bins' },
-    trucks: { min: 1, max: 10, label: 'Trucks' },
-    threshold: { min: 30, max: 90, label: 'Fill Threshold' },
-    workers: { min: 1, max: 16, label: 'Workers' },
-    candidates: { min: 1, max: 20, label: 'Route Candidates' },
-    max_2opt: { min: 10, max: 200, label: '2-Opt Iterations' },
-    alpha: { min: 0.1, max: 5.0, label: 'Alpha (α)' },
-    beta: { min: 1, max: 100, label: 'Beta (β)' }
-};
+import { CONFIG_LIMITS } from '../configLimits';
+import { blockNonNumericKeyDown, clampToLimits, parseNumericOrEmpty } from '../utils/numericInput';
 
 const Configuration = ({ config, setConfig }) => {
     const [livePreview, setLivePreview] = useState({
@@ -37,9 +27,18 @@ const Configuration = ({ config, setConfig }) => {
 
     // Check if value is out of limits
     const isOutOfLimits = (key, value) => {
-        if (!LIMITS[key]) return false;
-        const limit = LIMITS[key];
+        if (!CONFIG_LIMITS[key]) return false;
+        const limit = CONFIG_LIMITS[key];
         return value < limit.min || value > limit.max;
+    };
+
+    const clampConfigKey = (key) => {
+        const limit = CONFIG_LIMITS[key];
+        if (!limit) return;
+        setConfig(prev => ({
+            ...prev,
+            [key]: clampToLimits(prev[key], limit)
+        }));
     };
 
     // Calculate live preview based on current configuration
@@ -74,6 +73,10 @@ const Configuration = ({ config, setConfig }) => {
 
     const handleChange = (key, value) => {
         setConfig(prev => ({ ...prev, [key]: value }));
+    };
+
+    const handleNumericChange = (key, raw, { allowDecimal = false } = {}) => {
+        handleChange(key, parseNumericOrEmpty(raw, { allowDecimal }));
     };
 
     const containerVariants = {
@@ -155,14 +158,16 @@ const Configuration = ({ config, setConfig }) => {
                         <input
                             type="number"
                             value={config.bins}
-                            onChange={(e) => handleChange('bins', e.target.value === '' ? '' : parseInt(e.target.value))}
-                            min={LIMITS.bins.min}
-                            max={LIMITS.bins.max}
-                            placeholder={`Enter bins (${LIMITS.bins.min}-${LIMITS.bins.max})`}
+                            onKeyDown={(e) => blockNonNumericKeyDown(e)}
+                            onChange={(e) => handleNumericChange('bins', e.target.value)}
+                            onBlur={() => clampConfigKey('bins')}
+                            min={CONFIG_LIMITS.bins.min}
+                            max={CONFIG_LIMITS.bins.max}
+                            placeholder={`Enter bins (${CONFIG_LIMITS.bins.min}-${CONFIG_LIMITS.bins.max})`}
                             className={`config-input ${config.bins !== '' && isOutOfLimits('bins', config.bins) ? 'input-error' : ''}`}
                         />
                         <span className="config-hint">
-                            Garbage bins ({LIMITS.bins.min}-{LIMITS.bins.max})
+                            Garbage bins ({CONFIG_LIMITS.bins.min}-{CONFIG_LIMITS.bins.max})
                             {config.bins !== '' && isOutOfLimits('bins', config.bins) && <span className="error-text"> ⚠ Out of limits!</span>}
                         </span>
                     </div>
@@ -175,14 +180,16 @@ const Configuration = ({ config, setConfig }) => {
                         <input
                             type="number"
                             value={config.trucks}
-                            onChange={(e) => handleChange('trucks', e.target.value === '' ? '' : parseInt(e.target.value))}
-                            min={LIMITS.trucks.min}
-                            max={LIMITS.trucks.max}
-                            placeholder={`Enter trucks (${LIMITS.trucks.min}-${LIMITS.trucks.max})`}
+                            onKeyDown={(e) => blockNonNumericKeyDown(e)}
+                            onChange={(e) => handleNumericChange('trucks', e.target.value)}
+                            onBlur={() => clampConfigKey('trucks')}
+                            min={CONFIG_LIMITS.trucks.min}
+                            max={CONFIG_LIMITS.trucks.max}
+                            placeholder={`Enter trucks (${CONFIG_LIMITS.trucks.min}-${CONFIG_LIMITS.trucks.max})`}
                             className={`config-input ${config.trucks !== '' && isOutOfLimits('trucks', config.trucks) ? 'input-error' : ''}`}
                         />
                         <span className="config-hint">
-                            Waste collection vehicles ({LIMITS.trucks.min}-{LIMITS.trucks.max})
+                            Waste collection vehicles ({CONFIG_LIMITS.trucks.min}-{CONFIG_LIMITS.trucks.max})
                             {config.trucks !== '' && isOutOfLimits('trucks', config.trucks) && <span className="error-text"> ⚠ Out of limits!</span>}
                         </span>
                     </div>
@@ -196,8 +203,8 @@ const Configuration = ({ config, setConfig }) => {
                             type="range"
                             value={config.threshold || 60}
                             onChange={(e) => handleChange('threshold', parseInt(e.target.value))}
-                            min={30}
-                            max={90}
+                            min={CONFIG_LIMITS.threshold.min}
+                            max={CONFIG_LIMITS.threshold.max}
                             className="config-slider"
                         />
                         <div className="slider-value">
@@ -221,14 +228,16 @@ const Configuration = ({ config, setConfig }) => {
                         <input
                             type="number"
                             value={config.workers}
-                            onChange={(e) => handleChange('workers', e.target.value === '' ? '' : parseInt(e.target.value))}
-                            min={LIMITS.workers.min}
-                            max={LIMITS.workers.max}
-                            placeholder={`Enter workers (${LIMITS.workers.min}-${LIMITS.workers.max})`}
+                            onKeyDown={(e) => blockNonNumericKeyDown(e)}
+                            onChange={(e) => handleNumericChange('workers', e.target.value)}
+                            onBlur={() => clampConfigKey('workers')}
+                            min={CONFIG_LIMITS.workers.min}
+                            max={CONFIG_LIMITS.workers.max}
+                            placeholder={`Enter workers (${CONFIG_LIMITS.workers.min}-${CONFIG_LIMITS.workers.max})`}
                             className={`config-input ${config.workers !== '' && isOutOfLimits('workers', config.workers) ? 'input-error' : ''}`}
                         />
                         <span className="config-hint">
-                            Parallel processing threads ({LIMITS.workers.min}-{LIMITS.workers.max})
+                            Parallel processing threads ({CONFIG_LIMITS.workers.min}-{CONFIG_LIMITS.workers.max})
                             {config.workers !== '' && isOutOfLimits('workers', config.workers) && <span className="error-text"> ⚠ Out of limits!</span>}
                         </span>
                     </div>
@@ -241,14 +250,16 @@ const Configuration = ({ config, setConfig }) => {
                         <input
                             type="number"
                             value={config.candidates}
-                            onChange={(e) => handleChange('candidates', e.target.value === '' ? '' : parseInt(e.target.value))}
-                            min={LIMITS.candidates.min}
-                            max={LIMITS.candidates.max}
-                            placeholder={`Enter candidates (${LIMITS.candidates.min}-${LIMITS.candidates.max})`}
+                            onKeyDown={(e) => blockNonNumericKeyDown(e)}
+                            onChange={(e) => handleNumericChange('candidates', e.target.value)}
+                            onBlur={() => clampConfigKey('candidates')}
+                            min={CONFIG_LIMITS.candidates.min}
+                            max={CONFIG_LIMITS.candidates.max}
+                            placeholder={`Enter candidates (${CONFIG_LIMITS.candidates.min}-${CONFIG_LIMITS.candidates.max})`}
                             className={`config-input ${config.candidates !== '' && isOutOfLimits('candidates', config.candidates) ? 'input-error' : ''}`}
                         />
                         <span className="config-hint">
-                            More candidates = better routes but slower ({LIMITS.candidates.min}-{LIMITS.candidates.max})
+                            More candidates = better routes but slower ({CONFIG_LIMITS.candidates.min}-{CONFIG_LIMITS.candidates.max})
                             {config.candidates !== '' && isOutOfLimits('candidates', config.candidates) && <span className="error-text"> ⚠ Out of limits!</span>}
                         </span>
                     </div>
@@ -261,14 +272,16 @@ const Configuration = ({ config, setConfig }) => {
                         <input
                             type="number"
                             value={config.max_2opt}
-                            onChange={(e) => handleChange('max_2opt', e.target.value === '' ? '' : parseInt(e.target.value))}
-                            min={LIMITS.max_2opt.min}
-                            max={LIMITS.max_2opt.max}
-                            placeholder={`Enter iterations (${LIMITS.max_2opt.min}-${LIMITS.max_2opt.max})`}
+                            onKeyDown={(e) => blockNonNumericKeyDown(e)}
+                            onChange={(e) => handleNumericChange('max_2opt', e.target.value)}
+                            onBlur={() => clampConfigKey('max_2opt')}
+                            min={CONFIG_LIMITS.max_2opt.min}
+                            max={CONFIG_LIMITS.max_2opt.max}
+                            placeholder={`Enter iterations (${CONFIG_LIMITS.max_2opt.min}-${CONFIG_LIMITS.max_2opt.max})`}
                             className={`config-input ${config.max_2opt !== '' && isOutOfLimits('max_2opt', config.max_2opt) ? 'input-error' : ''}`}
                         />
                         <span className="config-hint">
-                            Route optimization iterations ({LIMITS.max_2opt.min}-{LIMITS.max_2opt.max})
+                            Route optimization iterations ({CONFIG_LIMITS.max_2opt.min}-{CONFIG_LIMITS.max_2opt.max})
                             {config.max_2opt !== '' && isOutOfLimits('max_2opt', config.max_2opt) && <span className="error-text"> ⚠ Out of limits!</span>}
                         </span>
                     </div>
@@ -292,14 +305,16 @@ const Configuration = ({ config, setConfig }) => {
                             type="number"
                             step="0.1"
                             value={config.alpha}
-                            onChange={(e) => handleChange('alpha', e.target.value === '' ? '' : parseFloat(e.target.value))}
-                            min={LIMITS.alpha.min}
-                            max={LIMITS.alpha.max}
-                            placeholder={`Enter alpha (${LIMITS.alpha.min}-${LIMITS.alpha.max})`}
+                            onKeyDown={(e) => blockNonNumericKeyDown(e, { allowDecimal: true })}
+                            onChange={(e) => handleNumericChange('alpha', e.target.value, { allowDecimal: true })}
+                            onBlur={() => clampConfigKey('alpha')}
+                            min={CONFIG_LIMITS.alpha.min}
+                            max={CONFIG_LIMITS.alpha.max}
+                            placeholder={`Enter alpha (${CONFIG_LIMITS.alpha.min}-${CONFIG_LIMITS.alpha.max})`}
                             className={`config-input ${config.alpha !== '' && isOutOfLimits('alpha', config.alpha) ? 'input-error' : ''}`}
                         />
                         <span className="config-hint">
-                            Higher value prioritizes closer bins ({LIMITS.alpha.min}-{LIMITS.alpha.max})
+                            Higher value prioritizes closer bins ({CONFIG_LIMITS.alpha.min}-{CONFIG_LIMITS.alpha.max})
                             {config.alpha !== '' && isOutOfLimits('alpha', config.alpha) && <span className="error-text"> ⚠ Out of limits!</span>}
                         </span>
                     </div>
@@ -313,14 +328,16 @@ const Configuration = ({ config, setConfig }) => {
                             type="number"
                             step="1"
                             value={config.beta}
-                            onChange={(e) => handleChange('beta', e.target.value === '' ? '' : parseFloat(e.target.value))}
-                            min={LIMITS.beta.min}
-                            max={LIMITS.beta.max}
-                            placeholder={`Enter beta (${LIMITS.beta.min}-${LIMITS.beta.max})`}
+                            onKeyDown={(e) => blockNonNumericKeyDown(e, { allowDecimal: true })}
+                            onChange={(e) => handleNumericChange('beta', e.target.value, { allowDecimal: true })}
+                            onBlur={() => clampConfigKey('beta')}
+                            min={CONFIG_LIMITS.beta.min}
+                            max={CONFIG_LIMITS.beta.max}
+                            placeholder={`Enter beta (${CONFIG_LIMITS.beta.min}-${CONFIG_LIMITS.beta.max})`}
                             className={`config-input ${config.beta !== '' && isOutOfLimits('beta', config.beta) ? 'input-error' : ''}`}
                         />
                         <span className="config-hint">
-                            Higher value prioritizes fuller bins ({LIMITS.beta.min}-{LIMITS.beta.max})
+                            Higher value prioritizes fuller bins ({CONFIG_LIMITS.beta.min}-{CONFIG_LIMITS.beta.max})
                             {config.beta !== '' && isOutOfLimits('beta', config.beta) && <span className="error-text"> ⚠ Out of limits!</span>}
                         </span>
                     </div>

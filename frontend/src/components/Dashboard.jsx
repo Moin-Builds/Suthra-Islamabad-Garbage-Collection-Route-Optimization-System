@@ -18,6 +18,8 @@ import {
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import './Dashboard.css';
+import { CONFIG_LIMITS } from '../configLimits';
+import { blockNonNumericKeyDown, clampToLimits, parseNumericOrEmpty } from '../utils/numericInput';
 
 const TRUCK_COLORS = ['#6366f1', '#22c55e', '#f59e0b', '#ef4444', '#06b6d4', '#8b5cf6'];
 
@@ -45,11 +47,18 @@ const Dashboard = ({ config, setConfig, results, onRun, isRunning, apiConnected,
         });
     };
 
-    // Parse number input - returns empty string if invalid (no hardcoded fallbacks)
-    const parseNumber = (value, isFloat = false) => {
-        if (value === '' || value === null || value === undefined) return '';
-        const parsed = isFloat ? parseFloat(value) : parseInt(value, 10);
-        return isNaN(parsed) ? '' : parsed;
+    const parseAndSet = (key, raw, { allowDecimal = false } = {}) => {
+        const value = parseNumericOrEmpty(raw, { allowDecimal });
+        handleConfigChange(key, value);
+    };
+
+    const clampConfigKey = (key) => {
+        const limit = CONFIG_LIMITS[key];
+        if (!limit) return;
+        setConfig(prev => ({
+            ...prev,
+            [key]: clampToLimits(prev[key], limit)
+        }));
     };
 
     // Generate route data from actual results
@@ -118,10 +127,12 @@ const Dashboard = ({ config, setConfig, results, onRun, isRunning, apiConnected,
                                 type="text"
                                 inputMode="numeric"
                                 value={config.bins}
-                                onChange={(e) => handleConfigChange('bins', parseNumber(e.target.value))}
-                                placeholder="Enter bins (10-500)"
+                                onKeyDown={(e) => blockNonNumericKeyDown(e)}
+                                onChange={(e) => parseAndSet('bins', e.target.value)}
+                                onBlur={() => clampConfigKey('bins')}
+                                placeholder={`Enter bins (${CONFIG_LIMITS.bins.min}-${CONFIG_LIMITS.bins.max})`}
                             />
-                            <span className="field-hint">Garbage bins (10-500)</span>
+                            <span className="field-hint">Garbage bins ({CONFIG_LIMITS.bins.min}-{CONFIG_LIMITS.bins.max})</span>
                         </div>
 
                         <div className="config-field">
@@ -133,10 +144,12 @@ const Dashboard = ({ config, setConfig, results, onRun, isRunning, apiConnected,
                                 type="text"
                                 inputMode="numeric"
                                 value={config.trucks}
-                                onChange={(e) => handleConfigChange('trucks', parseNumber(e.target.value))}
-                                placeholder="Enter trucks (1-10)"
+                                onKeyDown={(e) => blockNonNumericKeyDown(e)}
+                                onChange={(e) => parseAndSet('trucks', e.target.value)}
+                                onBlur={() => clampConfigKey('trucks')}
+                                placeholder={`Enter trucks (${CONFIG_LIMITS.trucks.min}-${CONFIG_LIMITS.trucks.max})`}
                             />
-                            <span className="field-hint">Vehicles (1-10)</span>
+                            <span className="field-hint">Vehicles ({CONFIG_LIMITS.trucks.min}-{CONFIG_LIMITS.trucks.max})</span>
                         </div>
 
                         <div className="config-field">
@@ -148,10 +161,21 @@ const Dashboard = ({ config, setConfig, results, onRun, isRunning, apiConnected,
                                 type="text"
                                 inputMode="numeric"
                                 value={config.threshold}
-                                onChange={(e) => handleConfigChange('threshold', parseNumber(e.target.value))}
-                                placeholder="Enter threshold (30-90)"
+                                onKeyDown={(e) => blockNonNumericKeyDown(e)}
+                                onChange={(e) => parseAndSet('threshold', e.target.value)}
+                                onBlur={() => {
+                                    const limit = CONFIG_LIMITS.threshold;
+                                    setConfig(prev => {
+                                        const clamped = clampToLimits(prev.threshold, limit);
+                                        return {
+                                            ...prev,
+                                            threshold: clamped === '' ? limit.default : clamped,
+                                        };
+                                    });
+                                }}
+                                placeholder={`Enter threshold (${CONFIG_LIMITS.threshold.min}-${CONFIG_LIMITS.threshold.max})`}
                             />
-                            <span className="field-hint">Min fill level (30-90%)</span>
+                            <span className="field-hint">Min fill level ({CONFIG_LIMITS.threshold.min}-{CONFIG_LIMITS.threshold.max}%)</span>
                         </div>
                     </div>
                 </div>
@@ -172,10 +196,12 @@ const Dashboard = ({ config, setConfig, results, onRun, isRunning, apiConnected,
                                 type="text"
                                 inputMode="numeric"
                                 value={config.workers}
-                                onChange={(e) => handleConfigChange('workers', parseNumber(e.target.value))}
-                                placeholder="Enter workers (1-16)"
+                                onKeyDown={(e) => blockNonNumericKeyDown(e)}
+                                onChange={(e) => parseAndSet('workers', e.target.value)}
+                                onBlur={() => clampConfigKey('workers')}
+                                placeholder={`Enter workers (${CONFIG_LIMITS.workers.min}-${CONFIG_LIMITS.workers.max})`}
                             />
-                            <span className="field-hint">Parallel threads (1-16)</span>
+                            <span className="field-hint">Parallel threads ({CONFIG_LIMITS.workers.min}-{CONFIG_LIMITS.workers.max})</span>
                         </div>
 
                         <div className="config-field">
@@ -187,10 +213,12 @@ const Dashboard = ({ config, setConfig, results, onRun, isRunning, apiConnected,
                                 type="text"
                                 inputMode="numeric"
                                 value={config.candidates}
-                                onChange={(e) => handleConfigChange('candidates', parseNumber(e.target.value))}
-                                placeholder="Enter candidates (1-20)"
+                                onKeyDown={(e) => blockNonNumericKeyDown(e)}
+                                onChange={(e) => parseAndSet('candidates', e.target.value)}
+                                onBlur={() => clampConfigKey('candidates')}
+                                placeholder={`Enter candidates (${CONFIG_LIMITS.candidates.min}-${CONFIG_LIMITS.candidates.max})`}
                             />
-                            <span className="field-hint">More = better (1-20)</span>
+                            <span className="field-hint">More = better ({CONFIG_LIMITS.candidates.min}-{CONFIG_LIMITS.candidates.max})</span>
                         </div>
 
                         <div className="config-field">
@@ -202,10 +230,12 @@ const Dashboard = ({ config, setConfig, results, onRun, isRunning, apiConnected,
                                 type="text"
                                 inputMode="numeric"
                                 value={config.max_2opt}
-                                onChange={(e) => handleConfigChange('max_2opt', parseNumber(e.target.value))}
-                                placeholder="Enter iterations (10-200)"
+                                onKeyDown={(e) => blockNonNumericKeyDown(e)}
+                                onChange={(e) => parseAndSet('max_2opt', e.target.value)}
+                                onBlur={() => clampConfigKey('max_2opt')}
+                                placeholder={`Enter iterations (${CONFIG_LIMITS.max_2opt.min}-${CONFIG_LIMITS.max_2opt.max})`}
                             />
-                            <span className="field-hint">Optimization (10-200)</span>
+                            <span className="field-hint">Optimization ({CONFIG_LIMITS.max_2opt.min}-{CONFIG_LIMITS.max_2opt.max})</span>
                         </div>
 
                         <div className="config-field">
@@ -217,8 +247,10 @@ const Dashboard = ({ config, setConfig, results, onRun, isRunning, apiConnected,
                                 type="text"
                                 inputMode="decimal"
                                 value={config.alpha}
-                                onChange={(e) => handleConfigChange('alpha', parseNumber(e.target.value, true))}
-                                placeholder="Enter alpha (0.1-5.0)"
+                                onKeyDown={(e) => blockNonNumericKeyDown(e, { allowDecimal: true })}
+                                onChange={(e) => parseAndSet('alpha', e.target.value, { allowDecimal: true })}
+                                onBlur={() => clampConfigKey('alpha')}
+                                placeholder={`Enter alpha (${CONFIG_LIMITS.alpha.min}-${CONFIG_LIMITS.alpha.max})`}
                             />
                             <span className="field-hint">Distance weight</span>
                         </div>

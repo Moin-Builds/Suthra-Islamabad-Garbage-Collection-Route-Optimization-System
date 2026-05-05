@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './App.css';
+import { CONFIG_LIMITS } from './configLimits';
 
 // Components
 import Header from './components/Header';
@@ -25,7 +26,7 @@ function App() {
   const [config, setConfig] = useState({
     bins: '',
     trucks: '',
-    threshold: '',
+    threshold: CONFIG_LIMITS.threshold.default,
     alpha: '',
     beta: '',
     candidates: '',

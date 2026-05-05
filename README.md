@@ -1,230 +1,181 @@
-# PDC Garbage Collection Route Optimization System
+# Garbage Collection Route Optimization System
 
-A **Parallel Computing** project that optimizes garbage collection routes using both serial and parallel processing techniques. Features a stunning React frontend with real-time visualization and performance comparison.
+Full-stack project for simulating and visualizing garbage collection routes.
 
-![Status](https://img.shields.io/badge/status-active-success.svg)
-![Python](https://img.shields.io/badge/python-3.8+-blue.svg)
-![React](https://img.shields.io/badge/react-18+-61DAFB.svg)
+- Backend: Python route optimizer + Flask API (serial/parallel modes)
+- Frontend: React (Vite) dashboard with map visualization and results comparison
 
-## 🌟 Features
+## What this project does
 
-- **Parallel Route Optimization**: Compare serial vs parallel execution times
-- **Real-time Visualization**: Interactive map showing bins, trucks, and routes
-- **Performance Metrics**: Detailed timing breakdown for each optimization phase
-- **Modern React UI**: Dark-themed, responsive interface with smooth animations
-- **Configurable Parameters**: Adjust bins, trucks, workers, and more from the UI
+Given a set of garbage bins (with fill levels) and a set of trucks (depots), the backend:
 
-## 📁 Project Structure
+1. Generates bins and trucks (API uses Islamabad lat/lng data; CLI can generate synthetic grid data)
+2. Selects only bins above a fill threshold
+3. Assigns each selected bin to a truck
+4. Builds a route (visit order) per truck and improves it using a 2‑opt local search
+5. Returns per-truck routes, total distance, and timing metrics
+
+Parallel mode accelerates:
+
+- Per-bin metric computation (distance/priority)
+- Candidate route evaluation per truck
+
+## Repository structure (high level)
 
 ```
-pdc_garbage_routes_project_PRO/
-├── pdc_garbage_routes/          # Python Backend
-│   ├── main.py                  # CLI entry point
-│   ├── api_server.py            # Flask API server (for frontend)
-│   ├── requirements.txt         # Python dependencies
-│   ├── src/                     # Core modules
-│   │   ├── benchmark.py         # Optimization runner
-│   │   ├── data_generator.py    # Generate bin/truck data
-│   │   ├── parallel_module.py   # Parallel processing logic
-│   │   ├── routing.py           # Route optimization algorithms
-│   │   ├── visualizer.py        # Map visualization
-│   │   └── models.py            # Data models (Bin, Truck)
-│   └── output/                  # Generated route maps
-│
-└── frontend/                    # React Frontend
-    ├── src/
-    │   ├── App.jsx              # Main application
-    │   ├── components/          # UI components
-    │   │   ├── Dashboard.jsx    # Main dashboard
-    │   │   ├── MapView.jsx      # Route visualization
-    │   │   ├── Configuration.jsx # Settings panel
-    │   │   └── Results.jsx      # Performance results
-    │   └── index.css            # Design system
-    └── package.json
+frontend/                 React + Vite UI
+pdc_garbage_routes/       Python backend (API + CLI)
+    api_server.py           Flask API server
+    main.py                 CLI runner
+    src/                    Core algorithm modules
+    tests/                  Basic unit tests
+build.sh                  Render build script
+render.yaml               Render deployment blueprint
 ```
 
----
+## Run locally (recommended: full stack)
 
-## 🚀 Quick Start
+Prerequisites:
 
-### Prerequisites
-- Python 3.8+
+- Python 3.10+ (3.11+ recommended)
 - Node.js 18+
-- npm or yarn
 
-### Installation
+Terminal 1 — backend API:
 
-#### 1. Install Python Dependencies
 ```bash
 cd pdc_garbage_routes
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
+python api_server.py
 ```
 
-#### 2. Install Frontend Dependencies
+Terminal 2 — frontend:
+
 ```bash
 cd frontend
 npm install
-```
-
----
-
-## ▶️ Running the Project
-
-### Option 1: Full Stack (Frontend + Backend API) - RECOMMENDED
-
-**Step 1: Start the Python API Server** (Terminal 1)
-```bash
-cd pdc_garbage_routes
-python api_server.py
-```
-The API will start at: `http://localhost:5000`
-
-**Step 2: Start the React Frontend** (Terminal 2)
-```bash
-cd frontend
 npm run dev
 ```
-The frontend will start at: `http://localhost:5173`
 
-**Step 3: Open in Browser**
-Navigate to `http://localhost:5173` and click **"Run Optimization"**!
+Open:
 
----
+- Frontend: http://localhost:5173
+- Backend health: http://localhost:5000/api/health
 
-### Option 2: CLI Only (No Frontend)
-
-Run optimization directly from command line:
+## Run locally (CLI only)
 
 ```bash
 cd pdc_garbage_routes
+python -m pip install -r requirements.txt
 python main.py
 ```
 
-**With Custom Parameters:**
-```bash
-python main.py --bins 5000 --trucks 6 --workers 8 --mode both
+Windows demo script:
+
+```bat
+cd pdc_garbage_routes
+scripts\run_demo_windows.bat
 ```
 
----
-
-## ⚙️ Configuration Options
-
-| Parameter | CLI Flag | Default | Description |
-|-----------|----------|---------|-------------|
-| Bins | `--bins` | 2000 | Number of garbage bins to simulate |
-| Trucks | `--trucks` | 4 | Number of collection trucks |
-| Threshold | `--threshold` | 70.0 | Fill % above which bins are collected |
-| Grid | `--grid` | 100.0 | Size of the simulation grid |
-| Alpha | `--alpha` | 1.0 | Weight for fill priority |
-| Beta | `--beta` | 25.0 | Weight for proximity scoring |
-| Candidates | `--candidates` | 24 | Number of route candidates to evaluate |
-| Workers | `--workers` | Auto | Parallel worker threads |
-| Mode | `--mode` | both | `serial`, `parallel`, or `both` |
-
----
-
-## 🎮 Frontend Usage
-
-### Dashboard
-- View key metrics: Total Bins, Active Trucks, Distance, Speedup
-- Click **"Run Optimization"** to start the process
-- Real-time progress shown in loading overlay
-
-### Configuration Page
-- Adjust all parameters using sliders and inputs
-- Changes apply immediately to the next run
-
-### Results Page
-- View detailed timing breakdown
-- Compare serial vs parallel performance
-- Visual speedup indicator
-
-### Map View
-- Interactive visualization of bins and trucks
-- Color-coded by truck assignment
-- Zoom and pan controls
-
----
-
-## 📊 Example Commands
-
-### Quick Demo (Default Settings)
-```bash
-python main.py
-```
-
-### Large Scale Test
-```bash
-python main.py --bins 20000 --trucks 6 --candidates 40 --mode both
-```
-
-### Parallel Only (Fast)
-```bash
-python main.py --bins 5000 --trucks 4 --mode parallel --workers 8
-```
-
-### Serial Only (Baseline)
-```bash
-python main.py --bins 5000 --trucks 4 --mode serial
-```
-
----
-
-## 🔌 API Endpoints
-
-When running `api_server.py`:
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/health` | GET | Check API status |
-| `/api/config/defaults` | GET | Get default configuration |
-| `/api/system/info` | GET | Get CPU info |
-| `/api/optimize` | POST | Run optimization with parameters |
-| `/api/progress` | GET | Get current progress |
-| `/api/results` | GET | Get latest results |
-
----
-
-## 📈 Output Files
-
-After running optimization:
+CLI outputs (generated under `pdc_garbage_routes/output/`):
 
 ```
 output/
-├── serial/
-│   └── route_map.png    # Serial execution route map
-├── parallel/
-│   └── route_map.png    # Parallel execution route map
-└── comparison.html      # Side-by-side comparison report
+    serial/route_map.png
+    parallel/route_map.png
+    comparison.html
 ```
 
----
+## How routing works (implementation summary)
 
-## 🛠️ Troubleshooting
+The main scoring/optimization ideas are implemented in:
 
-### API Not Connecting
-- Make sure Python API is running on port 5000
-- Check for CORS errors in browser console
-- Verify Flask and Flask-CORS are installed
+- `pdc_garbage_routes/src/parallel_module.py` (metrics, assignment, candidate routes)
+- `pdc_garbage_routes/src/routing.py` (greedy routing and 2‑opt improvement)
 
-### Frontend Not Loading
-- Run `npm install` in the frontend directory
-- Check if port 5173 is available
-- Try `npm run dev -- --port 3000` for different port
+### Bin selection (threshold)
 
-### Slow Performance
-- Reduce number of bins
-- Increase number of workers (up to CPU cores)
-- Decrease candidates for faster (but less optimal) routes
+Bins are filtered by fill level:
 
----
+- Selected bins: `fill >= threshold`
 
-## 👥 Team
+### Assignment and priority scoring (alpha/beta)
 
-PDC Semester Project - Parallel & Distributed Computing
+For each selected bin, the code finds its nearest truck and computes a priority:
 
----
+```
+priority = alpha * (fill/100) + beta * (1/(nearest_distance + 1))
+```
 
-## 📄 License
+Then each bin is assigned to the nearest truck; bins inside each truck “bucket” are sorted by priority.
 
-MIT License
+### Route construction (greedy) + improvement (2‑opt)
+
+For each truck bucket:
+
+- A greedy route is built by repeatedly picking the next bin with a high `(priority / (distance + 1))`
+- The route is improved using 2‑opt: it tries reversing segments to reduce route length
+
+### Candidate routes (route candidates)
+
+If `candidates > 1`, the solver generates additional randomized candidate routes per truck, improves each with 2‑opt, and keeps the shortest route.
+
+## Configuration parameters (meaning + effect)
+
+The UI and API accept these keys (CLI flags shown where available). The most important ones:
+
+| Parameter | UI / API key | CLI flag | Purpose | What happens if you increase it |
+|---|---|---|---|---|
+| Number of bins | `bins` | `--bins` | Problem size (how many bins exist) | More bins selected/assigned → longer routes and slower runtime |
+| Number of trucks | `trucks` | `--trucks` | How many routes (vehicles) exist | Usually fewer bins per truck and cleaner partitioning; total distance often drops, runtime can vary |
+| Fill threshold (%) | `threshold` | `--threshold` | Which bins get collected (`fill >= threshold`) | Fewer bins selected → shorter distance and faster runtime (but collects less) |
+| Route candidates | `candidates` | `--candidates` | How many alternative route orderings are tried per truck | Better chance of shorter routes, but more compute time |
+| 2‑opt iterations | `max_2opt` | `--max-2opt` | How long the 2‑opt improvement runs | Often improves distance, but can be much slower for large routes |
+| Workers | `workers` | `--workers` | Parallel processes used in parallel mode | Faster parallel runs up to CPU limits; too high can add overhead |
+| Mode | `mode` | `--mode` | `serial`, `parallel`, or `both` | `both` runs and compares two modes |
+| Alpha (α) | `alpha` | `--alpha` | Weight for fill contribution in priority | Higher α favors fuller bins more strongly |
+| Beta (β) | `beta` | `--beta` | Weight for proximity contribution in priority | Higher β favors nearer bins more strongly |
+
+Notes:
+
+- Increasing `candidates` and `max_2opt` improves route quality at the cost of runtime.
+- Increasing `trucks` reduces bins per route but adds more “return to depot” legs.
+- In API mode, the seed is derived from some inputs, so changing values may also change the generated scenario.
+
+## API (when running `pdc_garbage_routes/api_server.py`)
+
+Endpoints:
+
+- `GET /api/health`
+- `GET /api/config/defaults`
+- `GET /api/system/info`
+- `GET /api/city/info`
+- `POST /api/optimize`
+- `GET /api/progress`
+- `GET /api/results`
+
+The backend returns route data as ordered waypoints per truck, plus distance/time metrics.
+
+## Tests
+
+```bash
+cd pdc_garbage_routes
+python -m unittest
+```
+
+## Deployment (Render)
+
+This repo includes a Render blueprint:
+
+- `render.yaml` runs `build.sh` to build the React frontend and install Python deps
+- The service starts via `gunicorn api_server:app ...`
+
+In production builds, the frontend uses `/api` (relative) as the API base path, and the Flask app serves the built frontend from `frontend/dist/`.
+
+## Limitations (important for interpretation)
+
+- This is a heuristic solver (greedy + 2‑opt + randomized candidates), not an exact VRP optimizer.
+- Bin-to-truck assignment is based on nearest truck (with priority used for ordering), not a full global optimization across all trucks.
+
+## License
+
+No license file is included in this repository.

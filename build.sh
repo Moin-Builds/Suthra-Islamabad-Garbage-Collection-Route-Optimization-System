@@ -4,7 +4,7 @@
 set -o errexit  # Exit on error
 
 echo "=========================================="
-echo "PDC Garbage Routes - Render Build"
+echo "Suthra Islamabad - Render Build"
 echo "=========================================="
 
 # 1. Install Python dependencies

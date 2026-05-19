@@ -19,7 +19,7 @@ const Header = ({ apiConnected, cityInfo }) => {
                         <span>🚛</span>
                     </div>
                     <div className="logo-text">
-                        <span className="logo-title">Optimized Truck Routes</span>
+                        <span className="logo-title">Suthra Islamabad</span>
                         <span className="logo-subtitle">Islamabad Garbage Collection</span>
                     </div>
                 </div>

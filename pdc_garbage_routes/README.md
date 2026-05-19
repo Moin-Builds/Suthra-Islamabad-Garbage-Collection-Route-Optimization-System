@@ -1,4 +1,4 @@
-# Parallel Garbage Collection Route Optimization System (PDC Semester Project)
+# Suthra Islamabad - Parallel Garbage Collection Route Optimization System (PDC Semester Project)
 
 This project follows the proposal flow:
 Generate Garbage Bin Data → Filter Bins → Parallel Processing Module → Route Assignment → Generate Optimized Routes → Visualization & Analysis

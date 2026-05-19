@@ -134,7 +134,7 @@ def run_single_optimization(bins, trucks, selected, config, mode_name, workers):
 @app.route('/api/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
-    return jsonify({"status": "healthy", "message": "Truck Routes API is running - Islamabad, Pakistan"})
+    return jsonify({"status": "healthy", "message": "Suthra Islamabad API is running - Islamabad, Pakistan"})
 
 
 @app.route('/api/config/defaults', methods=['GET'])
@@ -398,7 +398,7 @@ def serve_frontend(path):
 
 if __name__ == '__main__':
     print("=" * 60)
-    print("PDC Garbage Routes API Server - Islamabad, Pakistan")
+    print("Suthra Islamabad API Server - Islamabad, Pakistan")
     print("=" * 60)
     print(f"CPU Cores Available: {os.cpu_count()}")
     print(f"City: Islamabad, Pakistan")

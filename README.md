@@ -1,4 +1,4 @@
-# Garbage Collection Route Optimization System
+# Suthra Islamabad - Garbage Collection Route Optimization System
 
 Full-stack project for simulating and visualizing garbage collection routes.
 

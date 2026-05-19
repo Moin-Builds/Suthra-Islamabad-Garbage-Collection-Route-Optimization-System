@@ -239,3 +239,16 @@ In production builds, the frontend uses `/api` (relative) as the API base path, 
 ## License
 
 No license file is included in this repository.
+
+---
+
+## 📄 Portfolio / CV Ready Descriptions
+
+Here is the professional, impact-driven description of **Suthra Islamabad** structured specifically for your resume/portfolio to match the format of your previous projects:
+
+### Suthra Islamabad - Garbage Route Optimization System
+*React | Python | Flask | Multiprocessing | Leaflet | REST APIs | JavaScript*
+* **Developed a real-time garbage route optimization dashboard using React and Python Flask.**
+* **Implemented parallelized greedy heuristics and 2-opt local search, achieving a 1.44x computational speedup.**
+* **Integrated interactive Leaflet maps with custom spatial clustering and dark-mode performance diagnostics.**
+
